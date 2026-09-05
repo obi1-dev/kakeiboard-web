@@ -1,11 +1,8 @@
 import { Link, Route, Routes } from 'react-router-dom'
 import { ConfirmPage } from './pages/ConfirmPage'
+import { HistoryPage } from './pages/HistoryPage'
 import { PaymentMethodsPage } from './pages/PaymentMethodsPage'
 import { ScanPage } from './pages/ScanPage'
-
-function Placeholder({ title }: { title: string }) {
-  return <p>{title}</p>
-}
 
 export function App() {
   return (
@@ -18,7 +15,7 @@ export function App() {
       <main>
         <Routes>
           <Route path="/scan" element={<ScanPage />} />
-          <Route path="/history" element={<Placeholder title="履歴" />} />
+          <Route path="/history" element={<HistoryPage />} />
           <Route path="/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/confirm" element={<ConfirmPage />} />
           <Route path="/receipts/:id/edit" element={<ConfirmPage />} />
