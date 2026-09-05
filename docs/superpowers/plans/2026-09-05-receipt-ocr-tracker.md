@@ -327,7 +327,7 @@ git commit -m "feat: add shared category and domain types"
 
 **Interfaces:**
 - Consumes: `env.DB`(D1、Task 1で用意)
-- Produces: `paymentMethodsRoutes: Hono` — `GET /`, `POST /`, `PUT /:id`, `DELETE /:id`。Task 9で`app.route('/api/payment-methods', paymentMethodsRoutes)`としてマウントされる。
+- Produces: `paymentMethodsRoutes: Hono` — `GET /`, `POST /`, `PUT /:id`, `DELETE /:id`。Task 7で`app.route('/api/payment-methods', paymentMethodsRoutes)`としてマウントされる。
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -499,7 +499,7 @@ git commit -m "feat: add payment methods CRUD API"
 
 **Interfaces:**
 - Consumes: `CATEGORIES`, `isCategory`(Task 2), `OcrDraft`, `ReceiptItemInput`(Task 2)
-- Produces: `buildOcrPrompt(): string`、`parseOcrResponse(response): OcrDraft`、`runOcr(ai: { run: Ai['run'] }, modelId: string, base64Image: string): Promise<OcrDraft>`、`uploadReceiptImage(bucket: R2Bucket, bytes: ArrayBuffer, contentType: string): Promise<string>`、`ocrRoutes: Hono`(`POST /`)。Task 9で`/api/ocr`にマウントされる。フロントエンドはTask 11でこのエンドポイントを呼ぶ。
+- Produces: `buildOcrPrompt(): string`、`parseOcrResponse(response): OcrDraft`、`runOcr(ai: { run: Ai['run'] }, modelId: string, base64Image: string): Promise<OcrDraft>`、`uploadReceiptImage(bucket: R2Bucket, bytes: ArrayBuffer, contentType: string): Promise<string>`、`ocrRoutes: Hono`(`POST /`)。Task 7で`/api/ocr`にマウントされる。フロントエンドはTask 11でこのエンドポイントを呼ぶ。
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -759,7 +759,7 @@ git commit -m "feat: add OCR prompt building, response parsing, and image upload
 
 **Interfaces:**
 - Consumes: `ReceiptItemInput`, `Receipt`(Task 2)
-- Produces: `receiptsRoutes: Hono` — `POST /receipts`, `GET /receipts`, `GET /receipts/:id`, `PUT /receipts/:id`, `DELETE /receipts/:id`, `GET /store-names`。Task 9で`app.route('/api', receiptsRoutes)`としてマウントされる。
+- Produces: `receiptsRoutes: Hono` — `POST /receipts`, `GET /receipts`, `GET /receipts/:id`, `PUT /receipts/:id`, `DELETE /receipts/:id`, `GET /store-names`。Task 7で`app.route('/api', receiptsRoutes)`としてマウントされる。
 
 - [ ] **Step 1: 失敗するテストを書く**
 
@@ -1060,7 +1060,7 @@ git commit -m "feat: add receipts CRUD API with item replacement and R2 cleanup"
 
 **Interfaces:**
 - Consumes: `env.DB`(Task 1)
-- Produces: `exportRoutes: Hono`(`GET /export.csv`)、`rowsToCsv(rows): string`。Task 9で`app.route('/api', exportRoutes)`としてマウントされる。
+- Produces: `exportRoutes: Hono`(`GET /export.csv`)、`rowsToCsv(rows): string`。Task 7で`app.route('/api', exportRoutes)`としてマウントされる。
 
 - [ ] **Step 1: 失敗するテストを書く**
 
