@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Trash2 } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
@@ -14,6 +15,7 @@ export function PaymentMethodsPage() {
   const [methods, setMethods] = useState<PaymentMethod[]>([])
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   async function reload() {
     setMethods(await getPaymentMethods())
@@ -25,21 +27,39 @@ export function PaymentMethodsPage() {
 
   async function handleSave() {
     if (!name.trim()) return
-    await createPaymentMethod(name.trim())
-    setName('')
-    setOpen(false)
-    await reload()
+    setError(null)
+    try {
+      await createPaymentMethod(name.trim())
+      setName('')
+      setOpen(false)
+      await reload()
+    } catch (err) {
+      setError((err as Error).message)
+    }
   }
 
   async function handleDelete(id: string) {
     if (!window.confirm('この支払い方法を削除しますか?')) return
-    await deletePaymentMethod(id)
-    await reload()
+    setError(null)
+    try {
+      await deletePaymentMethod(id)
+      await reload()
+    } catch (err) {
+      setError((err as Error).message)
+    }
   }
 
   return (
     <div>
       <h1>支払い方法</h1>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertTitle>エラー</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button>追加</Button>

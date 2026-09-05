@@ -43,11 +43,18 @@ paymentMethodsRoutes.put('/:id', async (c) => {
 
 paymentMethodsRoutes.delete('/:id', async (c) => {
   const id = c.req.param('id')
-  const result = await c.env.DB.prepare(
-    'DELETE FROM payment_methods WHERE id = ?'
-  ).bind(id).run()
-  if (result.meta.changes === 0) {
-    return c.json({ error: 'not found' }, 404)
+  try {
+    const result = await c.env.DB.prepare(
+      'DELETE FROM payment_methods WHERE id = ?'
+    ).bind(id).run()
+    if (result.meta.changes === 0) {
+      return c.json({ error: 'not found' }, 404)
+    }
+    return c.body(null, 204)
+  } catch (err) {
+    if ((err as Error).message?.includes('FOREIGN KEY constraint failed')) {
+      return c.json({ error: 'この支払い方法はレシートで使用されているため削除できません' }, 409)
+    }
+    throw err
   }
-  return c.body(null, 204)
 })

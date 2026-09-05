@@ -47,4 +47,25 @@ describe('PaymentMethodsPage', () => {
 
     await waitFor(() => expect(api.deletePaymentMethod).toHaveBeenCalledWith('1'))
   })
+
+  it('shows the server error message when deleting a payment method fails (e.g. still referenced by a receipt)', async () => {
+    vi.mocked(api.getPaymentMethods).mockResolvedValue([
+      { id: '1', name: '使用中のカード', created_at: '2026-01-01' },
+    ])
+    vi.mocked(api.deletePaymentMethod).mockRejectedValue(
+      new Error('この支払い方法はレシートで使用されているため削除できません')
+    )
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const user = userEvent.setup()
+
+    render(<PaymentMethodsPage />)
+
+    await user.click(await screen.findByRole('button', { name: '削除' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'この支払い方法はレシートで使用されているため削除できません'
+    )
+    // the row is still there since the delete failed
+    expect(screen.getByText('使用中のカード')).toBeInTheDocument()
+  })
 })
