@@ -92,7 +92,7 @@ export async function runOcr(
     ],
     generationConfig: { responseMimeType: 'application/json' },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any)) as GeminiResponse
+  } as any, { gateway: { id: 'default' } })) as GeminiResponse
   return parseOcrResponse(response)
 }
 

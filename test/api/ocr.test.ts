@@ -62,6 +62,7 @@ describe('runOcr', () => {
         contents: expect.any(Array),
         generationConfig: { responseMimeType: 'application/json' },
       }),
+      { gateway: { id: 'default' } },
     )
     expect(draft.store_name).toBe('モックストア')
   })
