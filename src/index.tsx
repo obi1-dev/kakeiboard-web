@@ -12,6 +12,8 @@ app.route('/api', receiptsRoutes)
 app.route('/api', exportRoutes)
 app.route('/api/ocr', ocrRoutes)
 
+app.all('/api/*', (c) => c.json({ error: 'not found' }, 404))
+
 app.use(renderer)
 app.get('*', (c) => c.render(<div id="root"></div>))
 
