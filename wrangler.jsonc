@@ -3,7 +3,6 @@
   "name": "kakeiboard-web",
   "compatibility_date": "2025-08-03",
   "main": "./src/index.tsx",
-  "account_id": "3395243b686d06c9af422031bf489bfc",
   "d1_databases": [
     {
       "binding": "DB",
@@ -19,7 +18,8 @@
     }
   ],
   "ai": {
-    "binding": "AI"
+    "binding": "AI",
+    "remote": true
   },
   "vars": {
     "OCR_MODEL_ID": "google/gemini-3.1-pro"
