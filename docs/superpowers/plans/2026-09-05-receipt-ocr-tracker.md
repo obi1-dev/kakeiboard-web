@@ -21,6 +21,8 @@
 - 金額は全て整数(円)。小数は扱わない。
 - D1のIDは全て`crypto.randomUUID()`で生成する。
 - 各タスック完了時に`pnpm test`(バックエンド)および該当する場合`pnpm run test:client`(フロントエンド)がパスすること。
+- shadcn/ui CLIは`shadcn@latest`ではなく`shadcn@3`を使う(Task 8実装時点で`@latest`はv4.21.0に上がっており、Base UI/プリセット選択という全く別のフローになっていた。`@3`系はNew York/Neutralというbrief通りの結果を出すことを確認済み)。
+- `vite.config.ts`と`vitest.client.config.ts`の`react()`プラグインには必ず`{ jsxImportSource: 'react' }`を明示する(プロジェクト全体の`tsconfig.json`が`hono/jsx`をデフォルトのjsxImportSourceにしているため、明示しないとクライアント側のReactコードがhono/jsx要素としてコンパイルされ、実行時に`Objects are not valid as a React child`で壊れる。ビルド自体は見た目上成功するため気づきにくい)。
 
 ---
 
@@ -1350,7 +1352,7 @@ import { defineConfig } from 'vite'
 import ssrPlugin from 'vite-ssr-components/plugin'
 
 export default defineConfig({
-  plugins: [cloudflare(), ssrPlugin(), react(), tailwindcss()],
+  plugins: [cloudflare(), ssrPlugin(), react({ jsxImportSource: 'react' }), tailwindcss()],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -1394,7 +1396,7 @@ pnpm add clsx tailwind-merge class-variance-authority lucide-react
 - [ ] **Step 6: shadcn/uiを初期化**
 
 ```bash
-npx shadcn@latest init
+npx shadcn@3 init
 ```
 
 プロンプトが出た場合: スタイルは`New York`、ベースカラーは`Neutral`(モノトーン基調のため)を選択する。生成される`components.json`と`src/components/ui/`はそのままコミットする。
@@ -1431,7 +1433,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react({ jsxImportSource: 'react' })],
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
   },
@@ -1761,7 +1763,7 @@ git commit -m "feat: add frontend API client for all backend endpoints"
 - [ ] **Step 1: shadcnコンポーネントを追加**
 
 ```bash
-npx shadcn@latest add button table dialog input label
+npx shadcn@3 add button table dialog input label
 ```
 
 - [ ] **Step 2: 失敗するテストを書く**
@@ -1954,7 +1956,7 @@ git commit -m "feat: add payment methods management page"
 - [ ] **Step 1: shadcnコンポーネントを追加**
 
 ```bash
-npx shadcn@latest add select
+npx shadcn@3 add select
 ```
 
 - [ ] **Step 2: 失敗するテストを書く(resizeImage)**
@@ -2203,7 +2205,7 @@ git commit -m "feat: add scan page with client-side image resize and OCR trigger
 - [ ] **Step 1: shadcnコンポーネントを追加**
 
 ```bash
-npx shadcn@latest add alert
+npx shadcn@3 add alert
 ```
 
 - [ ] **Step 2: 失敗するテストを書く**
