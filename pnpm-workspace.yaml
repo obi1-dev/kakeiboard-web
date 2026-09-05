@@ -3,6 +3,7 @@ onlyBuiltDependencies:
   - workerd
 allowBuilds:
   esbuild: true
+  msw: false
   workerd: true
 minimumReleaseAgeExclude:
   - hono@4.13.7
