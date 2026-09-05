@@ -570,6 +570,7 @@ describe('runOcr', () => {
         contents: expect.any(Array),
         generationConfig: { responseMimeType: 'application/json' },
       }),
+      { gateway: { id: 'default' } },
     )
     expect(draft.store_name).toBe('モックストア')
   })
@@ -688,7 +689,7 @@ export async function runOcr(
     ],
     generationConfig: { responseMimeType: 'application/json' },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any)) as GeminiResponse
+  } as any, { gateway: { id: 'default' } })) as GeminiResponse
   return parseOcrResponse(response)
 }
 
@@ -740,7 +741,7 @@ ocrRoutes.post('/', async (c) => {
 - [ ] **Step 4: テストを実行して通ることを確認**
 
 Run: `pnpm test -- ocr.test`
-Expected: 8件全てPASS
+Expected: 7件全てPASS
 
 - [ ] **Step 5: コミット**
 
