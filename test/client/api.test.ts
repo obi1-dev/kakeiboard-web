@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
-  createPaymentMethod, deleteReceipt, exportCsvUrl, getPaymentMethods, getReceipts, saveReceipt,
+  createPaymentMethod, deletePaymentMethod, deleteReceipt, exportCsvUrl, getPaymentMethods, getReceipts, saveReceipt,
 } from '../../src/client/lib/api'
 
 afterEach(() => {
@@ -57,13 +57,30 @@ describe('api client', () => {
     expect(fetchMock).toHaveBeenCalledWith('/api/receipts?from=2026-09-01&to=2026-09-30', undefined)
   })
 
-  it('deleteReceipt calls DELETE on the receipt id', async () => {
-    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => ({}) })
+  it('deleteReceipt calls DELETE on the receipt id and handles 204 response', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      json: async () => { throw new Error('should not be called') },
+    })
     vi.stubGlobal('fetch', fetchMock)
 
     await deleteReceipt('r1')
 
     expect(fetchMock).toHaveBeenCalledWith('/api/receipts/r1', { method: 'DELETE' })
+  })
+
+  it('deletePaymentMethod calls DELETE on the payment method id and handles 204 response', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 204,
+      json: async () => { throw new Error('should not be called') },
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    await deletePaymentMethod('pm1')
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/payment-methods/pm1', { method: 'DELETE' })
   })
 
   it('exportCsvUrl builds the download URL with date range', () => {

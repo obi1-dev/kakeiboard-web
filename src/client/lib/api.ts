@@ -8,6 +8,9 @@ async function request<T>(input: string, init?: RequestInit): Promise<T> {
     const body = await res.json().catch(() => ({}))
     throw new Error((body as { error?: string }).error ?? `Request failed: ${res.status}`)
   }
+  if (res.status === 204) {
+    return undefined as T
+  }
   return res.json() as Promise<T>
 }
 
