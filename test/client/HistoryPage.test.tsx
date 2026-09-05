@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { HistoryPage } from '../../src/client/pages/HistoryPage'
 import * as api from '../../src/client/lib/api'
 
@@ -18,6 +18,11 @@ function renderHistoryPage() {
   )
 }
 
+const samplePaymentMethods = [
+  { id: 'pm1', name: '現金', created_at: '2026-01-01' },
+  { id: 'pm2', name: 'カードA', created_at: '2026-01-02' },
+]
+
 const sampleReceipts = [
   {
     id: 'r1', store_name: 'テストスーパー', purchased_at: '2026-09-01',
@@ -27,13 +32,18 @@ const sampleReceipts = [
 ]
 
 describe('HistoryPage', () => {
-  it('lists past receipts with their store name and total', async () => {
+  beforeEach(() => {
+    vi.mocked(api.getPaymentMethods).mockResolvedValue(samplePaymentMethods)
+  })
+
+  it('lists past receipts with their store name, payment method, and total', async () => {
     vi.mocked(api.getReceipts).mockResolvedValue(sampleReceipts)
 
     renderHistoryPage()
 
     expect(await screen.findByText('テストスーパー')).toBeInTheDocument()
     expect(screen.getByText('2026-09-01')).toBeInTheDocument()
+    expect(await screen.findByText('現金')).toBeInTheDocument()
   })
 
   it('re-fetches with date filters when the filter form is submitted', async () => {
@@ -48,6 +58,23 @@ describe('HistoryPage', () => {
     await user.click(screen.getByRole('button', { name: '絞り込む' }))
 
     await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({ from: '2026-09-01', to: '2026-09-30' }))
+  })
+
+  it('re-fetches with store name and payment method filters when submitted', async () => {
+    vi.mocked(api.getReceipts).mockResolvedValue([])
+    const user = userEvent.setup()
+
+    renderHistoryPage()
+    await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({}))
+
+    await user.type(screen.getByLabelText('店名'), 'テスト店')
+    await user.click(screen.getByLabelText('支払い方法'))
+    await user.click(await screen.findByRole('option', { name: 'カードA' }))
+    await user.click(screen.getByRole('button', { name: '絞り込む' }))
+
+    await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({
+      store_name: 'テスト店', payment_method_id: 'pm2',
+    }))
   })
 
   it('deletes a receipt', async () => {
@@ -80,5 +107,32 @@ describe('HistoryPage', () => {
 
     const link = await screen.findByRole('link', { name: 'CSVダウンロード' })
     expect(link).toHaveAttribute('href', '/api/export.csv?from=2026-09-01')
+  })
+
+  it('shows an error message when fetching receipts fails on filter', async () => {
+    vi.mocked(api.getReceipts)
+      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error('取得に失敗しました'))
+    const user = userEvent.setup()
+
+    renderHistoryPage()
+    await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({}))
+
+    await user.click(screen.getByRole('button', { name: '絞り込む' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('取得に失敗しました')
+  })
+
+  it('shows an error message when deleting a receipt fails', async () => {
+    vi.mocked(api.getReceipts).mockResolvedValue(sampleReceipts)
+    vi.mocked(api.deleteReceipt).mockRejectedValue(new Error('削除に失敗しました'))
+    vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const user = userEvent.setup()
+
+    renderHistoryPage()
+
+    await user.click(await screen.findByRole('button', { name: '削除' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('削除に失敗しました')
   })
 })
