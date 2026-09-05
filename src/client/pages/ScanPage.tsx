@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
-import { getPaymentMethods, runOcr } from '@/client/lib/api'
+import { getPaymentMethods, OcrError, runOcr } from '@/client/lib/api'
 import { resizeImage } from '@/client/lib/resizeImage'
 import type { PaymentMethod } from '@/shared/types'
 
@@ -17,6 +17,7 @@ export function ScanPage() {
   const [file, setFile] = useState<File | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [failedImageKey, setFailedImageKey] = useState<string | undefined>(undefined)
 
   useEffect(() => {
     getPaymentMethods().then((list) => {
@@ -29,15 +30,34 @@ export function ScanPage() {
     if (!file || !paymentMethodId) return
     setLoading(true)
     setError(null)
+    setFailedImageKey(undefined)
     try {
       const resized = await resizeImage(file, 1600, 0.8)
       const draft = await runOcr(resized)
       navigate('/confirm', { state: { draft, paymentMethodId } })
     } catch (err) {
       setError((err as Error).message)
+      if (err instanceof OcrError) {
+        setFailedImageKey(err.imageKey)
+      }
     } finally {
       setLoading(false)
     }
+  }
+
+  function handleManualEntry() {
+    navigate('/confirm', {
+      state: {
+        draft: {
+          store_name: '',
+          purchased_at: new Date().toISOString().slice(0, 10),
+          receipt_total: null,
+          items: [],
+          image_key: failedImageKey ?? '',
+        },
+        paymentMethodId,
+      },
+    })
   }
 
   return (
@@ -70,9 +90,12 @@ export function ScanPage() {
       </Button>
 
       {error && (
-        <p role="alert">
-          {error}(もう一度試すか、確認画面で手動入力してください)
-        </p>
+        <div>
+          <p role="alert">
+            {error}(もう一度試すか、手動入力してください)
+          </p>
+          <Button variant="outline" onClick={handleManualEntry}>手動入力へ</Button>
+        </div>
       )}
     </div>
   )

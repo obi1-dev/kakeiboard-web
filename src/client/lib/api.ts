@@ -35,13 +35,28 @@ export function deletePaymentMethod(id: string) {
   return request<void>(`/api/payment-methods/${id}`, { method: 'DELETE' })
 }
 
+// Thrown when OCR itself fails. The server has already uploaded the image to
+// R2 by the time OCR runs, so the failure response includes `image_key` -
+// carrying it on the error lets the caller offer a manual-entry fallback
+// without re-uploading the photo.
+export class OcrError extends Error {
+  imageKey?: string
+
+  constructor(message: string, imageKey?: string) {
+    super(message)
+    this.name = 'OcrError'
+    this.imageKey = imageKey
+  }
+}
+
 export async function runOcr(file: File): Promise<OcrDraft> {
   const formData = new FormData()
   formData.set('image', file)
   const res = await fetch('/api/ocr', { method: 'POST', body: formData })
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
-    throw new Error((body as { error?: string }).error ?? `OCR failed: ${res.status}`)
+    const { error, image_key } = body as { error?: string; image_key?: string }
+    throw new OcrError(error ?? `OCR failed: ${res.status}`, image_key)
   }
   return res.json()
 }
