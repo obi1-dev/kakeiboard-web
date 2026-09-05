@@ -1,5 +1,6 @@
 import { Link, Route, Routes } from 'react-router-dom'
 import { PaymentMethodsPage } from './pages/PaymentMethodsPage'
+import { ScanPage } from './pages/ScanPage'
 
 function Placeholder({ title }: { title: string }) {
   return <p>{title}</p>
@@ -15,11 +16,11 @@ export function App() {
       </nav>
       <main>
         <Routes>
-          <Route path="/scan" element={<Placeholder title="スキャン" />} />
+          <Route path="/scan" element={<ScanPage />} />
           <Route path="/history" element={<Placeholder title="履歴" />} />
           <Route path="/payment-methods" element={<PaymentMethodsPage />} />
           <Route path="/confirm" element={<Placeholder title="確認" />} />
-          <Route path="*" element={<Placeholder title="スキャン" />} />
+          <Route path="*" element={<ScanPage />} />
         </Routes>
       </main>
     </div>

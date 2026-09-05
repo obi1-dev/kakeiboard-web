@@ -1,10 +1,14 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { App } from '../../src/client/App'
+import * as api from '../../src/client/lib/api'
+
+vi.mock('../../src/client/lib/api')
 
 describe('App', () => {
   it('renders the app navigation', () => {
+    vi.mocked(api.getPaymentMethods).mockResolvedValue([])
     render(
       <MemoryRouter initialEntries={['/scan']}>
         <App />
