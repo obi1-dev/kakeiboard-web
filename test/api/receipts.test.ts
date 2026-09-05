@@ -111,6 +111,54 @@ describe('receipts API', () => {
     expect(await env.RECEIPTS_BUCKET.get(imageKey)).toBeNull()
   })
 
+  it('lists receipts with correctly nested items via the LEFT JOIN query, including a receipt with no items', async () => {
+    const paymentMethodId = await createPaymentMethod('現金')
+
+    await receiptsRoutes.request('/receipts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...samplePayload(paymentMethodId),
+        store_name: '店A', purchased_at: '2026-09-01',
+        items: [
+          { name: 'りんご', price: 100, quantity: 2, category: '食費' },
+          { name: 'ノート', price: 100, quantity: 1, category: '日用品' },
+        ],
+      }),
+    }, env)
+    await receiptsRoutes.request('/receipts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...samplePayload(paymentMethodId),
+        store_name: '店B', purchased_at: '2026-09-02',
+        items: [{ name: 'バナナ', price: 50, quantity: 3, category: '食費' }],
+      }),
+    }, env)
+    await receiptsRoutes.request('/receipts', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        ...samplePayload(paymentMethodId),
+        store_name: '店C', purchased_at: '2026-09-03',
+        items: [],
+      }),
+    }, env)
+
+    const res = await receiptsRoutes.request('/receipts', {}, env)
+    expect(res.status).toBe(200)
+    const list = await res.json<{ store_name: string; items: { name: string; amount: number }[] }[]>()
+    expect(list).toHaveLength(3)
+
+    const byStore = Object.fromEntries(list.map((r) => [r.store_name, r]))
+    expect(byStore['店A'].items).toHaveLength(2)
+    expect(byStore['店A'].items[0]).toMatchObject({ name: 'りんご', amount: 200 })
+    expect(byStore['店A'].items[1]).toMatchObject({ name: 'ノート', amount: 100 })
+    expect(byStore['店B'].items).toHaveLength(1)
+    expect(byStore['店B'].items[0]).toMatchObject({ name: 'バナナ', amount: 150 })
+    expect(byStore['店C'].items).toEqual([])
+
+    // newest purchased_at first
+    expect(list.map((r) => r.store_name)).toEqual(['店C', '店B', '店A'])
+  })
+
   it('lists distinct store names for autocomplete', async () => {
     const paymentMethodId = await createPaymentMethod('現金')
     await receiptsRoutes.request('/receipts', {
