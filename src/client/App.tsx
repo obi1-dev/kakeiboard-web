@@ -1,4 +1,5 @@
 import { Link, Route, Routes } from 'react-router-dom'
+import { ConfirmPage } from './pages/ConfirmPage'
 import { PaymentMethodsPage } from './pages/PaymentMethodsPage'
 import { ScanPage } from './pages/ScanPage'
 
@@ -19,7 +20,8 @@ export function App() {
           <Route path="/scan" element={<ScanPage />} />
           <Route path="/history" element={<Placeholder title="履歴" />} />
           <Route path="/payment-methods" element={<PaymentMethodsPage />} />
-          <Route path="/confirm" element={<Placeholder title="確認" />} />
+          <Route path="/confirm" element={<ConfirmPage />} />
+          <Route path="/receipts/:id/edit" element={<ConfirmPage />} />
           <Route path="*" element={<ScanPage />} />
         </Routes>
       </main>
