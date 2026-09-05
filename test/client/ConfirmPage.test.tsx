@@ -108,4 +108,19 @@ describe('ConfirmPage', () => {
     })))
     expect(await screen.findByText('履歴ページ')).toBeInTheDocument()
   })
+
+  it('shows an error message and keeps the input when saving fails', async () => {
+    vi.mocked(api.saveReceipt).mockRejectedValue(new Error('D1書き込みに失敗しました'))
+    const user = userEvent.setup()
+    renderConfirmPage()
+
+    await screen.findByLabelText('品名')
+    await user.click(screen.getByRole('button', { name: 'OK' }))
+
+    expect(await screen.findByText('D1書き込みに失敗しました')).toBeInTheDocument()
+    // input is retained, not navigated away
+    expect(screen.getByDisplayValue('テストスーパー')).toBeInTheDocument()
+    expect(screen.getByLabelText('品名')).toHaveValue('りんご')
+    expect(screen.queryByText('履歴ページ')).not.toBeInTheDocument()
+  })
 })

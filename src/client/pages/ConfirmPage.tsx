@@ -32,6 +32,7 @@ export function ConfirmPage() {
   const [items, setItems] = useState<ReceiptItemInput[]>(state?.draft.items ?? [])
   const [storeNames, setStoreNames] = useState<string[]>([])
   const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     getStoreNames().then(setStoreNames)
@@ -77,6 +78,7 @@ export function ConfirmPage() {
 
   async function handleSave() {
     setSaving(true)
+    setError(null)
     try {
       const payload = {
         store_name: storeName,
@@ -92,6 +94,8 @@ export function ConfirmPage() {
         await saveReceipt(payload)
       }
       navigate('/history')
+    } catch (err) {
+      setError((err as Error).message)
     } finally {
       setSaving(false)
     }
@@ -100,6 +104,13 @@ export function ConfirmPage() {
   return (
     <div>
       <h1>確認</h1>
+
+      {error && (
+        <Alert variant="destructive">
+          <AlertTitle>保存に失敗しました</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <Label htmlFor="store-name">店名</Label>
       <Input
