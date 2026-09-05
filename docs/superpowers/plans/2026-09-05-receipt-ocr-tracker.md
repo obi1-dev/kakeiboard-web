@@ -20,7 +20,7 @@
 - サードパーティモデルへの入力は Gemini generateContent REST 形式(`contents[].parts[]`、画像は`inlineData: { mimeType, data }`、JSON強制出力は`generationConfig.responseMimeType: 'application/json'` — いずれもcamelCase)。
 - 金額は全て整数(円)。小数は扱わない。
 - D1のIDは全て`crypto.randomUUID()`で生成する。
-- 各タスック完了時に`npm test`(バックエンド)および該当する場合`npm run test:client`(フロントエンド)がパスすること。
+- 各タスック完了時に`pnpm test`(バックエンド)および該当する場合`pnpm run test:client`(フロントエンド)がパスすること。
 
 ---
 
@@ -35,7 +35,7 @@
 
 **Interfaces:**
 - Produces: D1バインディング`DB`、R2バインディング`RECEIPTS_BUCKET`、AIバインディング`AI`、環境変数`OCR_MODEL_ID`。以降の全バックエンドタスクはこれらを`c.env.DB` / `c.env.RECEIPTS_BUCKET` / `c.env.AI` / `c.env.OCR_MODEL_ID`として利用する。
-- Produces: テスト実行コマンド `npm test`(このタスク以降、全バックエンドテストはこの設定で動く)。
+- Produces: テスト実行コマンド `pnpm test`(このタスク以降、全バックエンドテストはこの設定で動く)。
 
 - [ ] **Step 1: `wrangler.jsonc`にD1/R2/AI/varsバインディングを追加**
 
@@ -113,7 +113,7 @@ CREATE INDEX idx_receipt_items_receipt_id ON receipt_items(receipt_id);
 - [ ] **Step 3: 依存パッケージをインストール**
 
 ```bash
-npm install -D @cloudflare/vitest-plugin vitest
+pnpm add -D @cloudflare/vitest-plugin vitest
 ```
 
 - [ ] **Step 4: `vitest.config.ts`を作成**
@@ -195,13 +195,13 @@ describe('backend bindings sanity check', () => {
 
 - [ ] **Step 8: テストを実行して通ることを確認**
 
-Run: `npm test`
+Run: `pnpm test`
 Expected: `test/api/sanity.test.ts`の2件がPASS
 
 - [ ] **Step 9: 型生成とコミット**
 
 ```bash
-npm run cf-typegen
+pnpm run cf-typegen
 git add wrangler.jsonc migrations vitest.config.ts test/api/apply-migrations.ts test/api/sanity.test.ts worker-configuration.d.ts package.json package-lock.json
 git commit -m "test: add D1/R2/AI bindings and vitest-plugin backend test setup"
 ```
@@ -242,7 +242,7 @@ describe('categories', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm test -- shared-categories`
+Run: `pnpm test -- shared-categories`
 Expected: FAIL(`src/shared/categories.ts`が存在しない)
 
 - [ ] **Step 3: `src/shared/categories.ts`を実装**
@@ -307,7 +307,7 @@ export interface OcrDraft {
 
 - [ ] **Step 5: テストを実行して通ることを確認**
 
-Run: `npm test -- shared-categories`
+Run: `pnpm test -- shared-categories`
 Expected: PASS
 
 - [ ] **Step 6: コミット**
@@ -416,7 +416,7 @@ describe('payment methods API', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm test -- payment-methods`
+Run: `pnpm test -- payment-methods`
 Expected: FAIL(`src/api/payment-methods.ts`が存在しない)
 
 - [ ] **Step 3: `src/api/payment-methods.ts`を実装**
@@ -479,7 +479,7 @@ paymentMethodsRoutes.delete('/:id', async (c) => {
 
 - [ ] **Step 4: テストを実行して通ることを確認**
 
-Run: `npm test -- payment-methods`
+Run: `pnpm test -- payment-methods`
 Expected: 5件全てPASS
 
 - [ ] **Step 5: コミット**
@@ -588,7 +588,7 @@ describe('uploadReceiptImage', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm test -- ocr.test`
+Run: `pnpm test -- ocr.test`
 Expected: FAIL(`src/api/ocr.ts`が存在しない)
 
 - [ ] **Step 3: `src/api/ocr.ts`を実装**
@@ -739,7 +739,7 @@ ocrRoutes.post('/', async (c) => {
 
 - [ ] **Step 4: テストを実行して通ることを確認**
 
-Run: `npm test -- ocr.test`
+Run: `pnpm test -- ocr.test`
 Expected: 8件全てPASS
 
 - [ ] **Step 5: コミット**
@@ -902,7 +902,7 @@ describe('receipts API', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm test -- receipts.test`
+Run: `pnpm test -- receipts.test`
 Expected: FAIL(`src/api/receipts.ts`が存在しない)
 
 - [ ] **Step 3: `src/api/receipts.ts`を実装**
@@ -1040,7 +1040,7 @@ receiptsRoutes.get('/store-names', async (c) => {
 
 - [ ] **Step 4: テストを実行して通ることを確認**
 
-Run: `npm test -- receipts.test`
+Run: `pnpm test -- receipts.test`
 Expected: 5件全てPASS
 
 - [ ] **Step 5: コミット**
@@ -1119,7 +1119,7 @@ describe('GET /export.csv', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm test -- export.test`
+Run: `pnpm test -- export.test`
 Expected: FAIL(`src/api/export.ts`が存在しない)
 
 - [ ] **Step 3: `src/api/export.ts`を実装**
@@ -1195,7 +1195,7 @@ exportRoutes.get('/export.csv', async (c) => {
 
 - [ ] **Step 4: テストを実行して通ることを確認**
 
-Run: `npm test -- export.test`
+Run: `pnpm test -- export.test`
 Expected: 2件全てPASS
 
 - [ ] **Step 5: コミット**
@@ -1244,7 +1244,7 @@ describe('app shell', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm test -- shell.test`
+Run: `pnpm test -- shell.test`
 Expected: FAIL(`/history`が404、またはmain.tsxへの参照がない)
 
 - [ ] **Step 3: `src/renderer.tsx`を更新**
@@ -1299,7 +1299,7 @@ export default app
 
 - [ ] **Step 5: テストを実行して通ることを確認**
 
-Run: `npm test -- shell.test`
+Run: `pnpm test -- shell.test`
 Expected: 2件全てPASS
 
 - [ ] **Step 6: コミット**
@@ -1327,15 +1327,15 @@ git commit -m "feat: mount API routes and serve React island shell for all other
 
 **Interfaces:**
 - Produces: `App`コンポーネント(react-router-domのルート定義を持つ)。Task 10〜13で各ページをルートに追加していく。
-- Produces: `npm run test:client`コマンド。
+- Produces: `pnpm run test:client`コマンド。
 - Produces: `@/*`パスエイリアス(`src/*`) — 以降のフロントエンドタスクは`@/components/ui/*`, `@/lib/*`の形式でimportする。
 
 - [ ] **Step 1: 依存パッケージをインストール**
 
 ```bash
-npm install react react-dom react-router-dom
-npm install -D @vitejs/plugin-react tailwindcss @tailwindcss/vite @types/react @types/react-dom @types/node
-npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
+pnpm add react react-dom react-router-dom
+pnpm add -D @vitejs/plugin-react tailwindcss @tailwindcss/vite @types/react @types/react-dom @types/node
+pnpm add -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
 ```
 
 - [ ] **Step 2: `vite.config.ts`にReact/Tailwindプラグインとパスエイリアスを追加**
@@ -1387,7 +1387,7 @@ export function cn(...inputs: ClassValue[]) {
 ```
 
 ```bash
-npm install clsx tailwind-merge class-variance-authority lucide-react
+pnpm add clsx tailwind-merge class-variance-authority lucide-react
 ```
 
 - [ ] **Step 6: shadcn/uiを初期化**
@@ -1456,7 +1456,7 @@ import '@testing-library/jest-dom/vitest'
 
 - [ ] **Step 10: テストを実行して失敗することを確認**
 
-Run: `npm run test:client`
+Run: `pnpm run test:client`
 Expected: FAIL(`src/client/App.tsx`が存在しない)
 
 - [ ] **Step 11: `src/client/App.tsx`を実装(この時点ではプレースホルダーページ)**
@@ -1514,12 +1514,12 @@ createRoot(rootEl).render(
 
 - [ ] **Step 13: テストを実行して通ることを確認**
 
-Run: `npm run test:client`
+Run: `pnpm run test:client`
 Expected: PASS
 
 - [ ] **Step 14: バックエンドテストも壊れていないことを確認**
 
-Run: `npm test`
+Run: `pnpm test`
 Expected: 既存の全テストPASS(フロントエンド変更はバックエンドに影響しないはずだが念のため確認)
 
 - [ ] **Step 15: コミット**
@@ -1624,7 +1624,7 @@ describe('api client', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm run test:client -- api.test`
+Run: `pnpm run test:client -- api.test`
 Expected: FAIL(`src/client/lib/api.ts`が存在しない)
 
 - [ ] **Step 3: `src/client/lib/api.ts`を実装**
@@ -1734,7 +1734,7 @@ export function exportCsvUrl(from?: string, to?: string): string {
 
 - [ ] **Step 4: テストを実行して通ることを確認**
 
-Run: `npm run test:client -- api.test`
+Run: `pnpm run test:client -- api.test`
 Expected: 6件全てPASS
 
 - [ ] **Step 5: コミット**
@@ -1822,7 +1822,7 @@ describe('PaymentMethodsPage', () => {
 
 - [ ] **Step 3: テストを実行して失敗することを確認**
 
-Run: `npm run test:client -- PaymentMethodsPage`
+Run: `pnpm run test:client -- PaymentMethodsPage`
 Expected: FAIL(`src/client/pages/PaymentMethodsPage.tsx`が存在しない)
 
 - [ ] **Step 4: `src/client/pages/PaymentMethodsPage.tsx`を実装**
@@ -1925,7 +1925,7 @@ export function PaymentMethodsPage() {
 
 - [ ] **Step 6: テストを実行して通ることを確認**
 
-Run: `npm run test:client`
+Run: `pnpm run test:client`
 Expected: 全テストPASS(既存のApp.test.tsxも壊れていないこと)
 
 - [ ] **Step 7: コミット**
@@ -1979,7 +1979,7 @@ describe('resizeImage', () => {
 
 - [ ] **Step 3: テストを実行して失敗することを確認**
 
-Run: `npm run test:client -- resizeImage`
+Run: `pnpm run test:client -- resizeImage`
 Expected: FAIL(`src/client/lib/resizeImage.ts`が存在しない)
 
 - [ ] **Step 4: `src/client/lib/resizeImage.ts`を実装**
@@ -2015,7 +2015,7 @@ export async function resizeImage(file: File, maxDimension: number, quality: num
 
 - [ ] **Step 5: テストを実行して通ることを確認**
 
-Run: `npm run test:client -- resizeImage`
+Run: `pnpm run test:client -- resizeImage`
 Expected: PASS
 
 - [ ] **Step 6: 失敗するテストを書く(ScanPage)**
@@ -2074,7 +2074,7 @@ describe('ScanPage', () => {
 
 - [ ] **Step 7: テストを実行して失敗することを確認**
 
-Run: `npm run test:client -- ScanPage`
+Run: `pnpm run test:client -- ScanPage`
 Expected: FAIL(`src/client/pages/ScanPage.tsx`が存在しない)
 
 - [ ] **Step 8: `src/client/pages/ScanPage.tsx`を実装**
@@ -2175,7 +2175,7 @@ export function ScanPage() {
 
 - [ ] **Step 10: テストを実行して通ることを確認**
 
-Run: `npm run test:client`
+Run: `pnpm run test:client`
 Expected: 全テストPASS
 
 - [ ] **Step 11: コミット**
@@ -2325,7 +2325,7 @@ describe('ConfirmPage', () => {
 
 - [ ] **Step 3: テストを実行して失敗することを確認**
 
-Run: `npm run test:client -- ConfirmPage`
+Run: `pnpm run test:client -- ConfirmPage`
 Expected: FAIL(`src/client/pages/ConfirmPage.tsx`が存在しない)
 
 - [ ] **Step 4: `src/client/pages/ConfirmPage.tsx`を実装(新規保存モードと編集モードの両対応)**
@@ -2525,7 +2525,7 @@ export function ConfirmPage() {
 
 - [ ] **Step 6: テストを実行して通ることを確認**
 
-Run: `npm run test:client`
+Run: `pnpm run test:client`
 Expected: 全テストPASS
 
 - [ ] **Step 7: コミット**
@@ -2641,7 +2641,7 @@ describe('HistoryPage', () => {
 
 - [ ] **Step 2: テストを実行して失敗することを確認**
 
-Run: `npm run test:client -- HistoryPage`
+Run: `pnpm run test:client -- HistoryPage`
 Expected: FAIL(`src/client/pages/HistoryPage.tsx`が存在しない)
 
 - [ ] **Step 3: `src/client/pages/HistoryPage.tsx`を実装**
@@ -2746,7 +2746,7 @@ export function HistoryPage() {
 
 - [ ] **Step 5: テストを実行して通ることを確認**
 
-Run: `npm run test:client`
+Run: `pnpm run test:client`
 Expected: 全テストPASS
 
 - [ ] **Step 6: コミット**
@@ -2823,7 +2823,7 @@ export function App() {
 
 - [ ] **Step 2: テストを実行して通ることを確認(App.test.tsxのリンク名は変更していないため通るはず)**
 
-Run: `npm run test:client`
+Run: `pnpm run test:client`
 Expected: 全テストPASS
 
 - [ ] **Step 3: コミット**
@@ -2847,10 +2847,10 @@ git commit -m "style: add monotone responsive navigation layout"
 - [ ] **Step 1: ローカルで一通り動作確認する**
 
 ```bash
-npm run cf-typegen
-npm test
-npm run test:client
-npm run dev
+pnpm run cf-typegen
+pnpm test
+pnpm run test:client
+pnpm run dev
 ```
 
 ブラウザで `http://localhost:5173`(または表示されたポート)を開き、以下を手動確認する:
@@ -2870,7 +2870,7 @@ Expected: 上記5点が全て問題なく動作する。問題があれば該当
 ```markdown
 ## 初回セットアップ(本番デプロイ前)
 
-このプロジェクトはD1・R2・Workers AIバインディングを使用します。ローカル開発(`npm run dev`)とテスト(`npm test`)は`wrangler.jsonc`のダミーのD1 `database_id`のままローカルSQLiteで動作しますが、**本番デプロイ前には以下が必要です**:
+このプロジェクトはD1・R2・Workers AIバインディングを使用します。ローカル開発(`pnpm run dev`)とテスト(`pnpm test`)は`wrangler.jsonc`のダミーのD1 `database_id`のままローカルSQLiteで動作しますが、**本番デプロイ前には以下が必要です**:
 
 ```txt
 npx wrangler d1 create kakeiboard-web-db
