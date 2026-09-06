@@ -1,28 +1,28 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "kakeiboard-web",
-  "compatibility_date": "2025-08-03",
-  "main": "./src/index.tsx",
-  "account_id": "3395243b686d06c9af422031bf489bfc",
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "kakeiboard-web-db",
-      "database_id": "00000000-0000-0000-0000-000000000000",
-      "migrations_dir": "./migrations"
-    }
-  ],
-  "r2_buckets": [
-    {
-      "binding": "RECEIPTS_BUCKET",
-      "bucket_name": "kakeiboard-web-receipts"
-    }
-  ],
-  "ai": {
-    "binding": "AI",
-    "remote": true
-  },
-  "vars": {
-    "OCR_MODEL_ID": "google/gemini-3.1-pro"
-  }
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "kakeiboard-web",
+	"compatibility_date": "2025-08-03",
+	"main": "./src/index.tsx",
+	"account_id": "3395243b686d06c9af422031bf489bfc",
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "kakeiboard-web-db",
+			"database_id": "8845dcab-41ad-4707-a9d9-440da87a6d50",
+			"migrations_dir": "./migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "RECEIPTS_BUCKET",
+			"bucket_name": "kakeiboard-web-receipts"
+		}
+	],
+	"ai": {
+		"binding": "AI",
+		"remote": true
+	},
+	"vars": {
+		"OCR_MODEL_ID": "google/gemini-3.1-pro"
+	}
 }
