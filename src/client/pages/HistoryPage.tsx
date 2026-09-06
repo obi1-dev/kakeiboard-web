@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Download, Pencil, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { DatePicker } from '@/components/date-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -99,11 +100,11 @@ export function HistoryPage() {
         <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
           <div className="space-y-2">
             <Label htmlFor="from-date">開始日</Label>
-            <Input id="from-date" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+            <DatePicker id="from-date" value={from} onChange={setFrom} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="to-date">終了日</Label>
-            <Input id="to-date" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+            <DatePicker id="to-date" value={to} onChange={setTo} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="store-name-filter">店名</Label>

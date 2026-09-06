@@ -47,17 +47,27 @@ describe('HistoryPage', () => {
   })
 
   it('re-fetches with date filters when the filter form is submitted', async () => {
-    vi.mocked(api.getReceipts).mockResolvedValue([])
-    const user = userEvent.setup()
+    // The date pickers default to the current month when no date is picked
+    // yet, so pin "today" to make the visible calendar days deterministic.
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    vi.setSystemTime(new Date('2026-09-06'))
+    try {
+      vi.mocked(api.getReceipts).mockResolvedValue([])
+      const user = userEvent.setup()
 
-    renderHistoryPage()
-    await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({}))
+      renderHistoryPage()
+      await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({}))
 
-    await user.type(screen.getByLabelText('開始日'), '2026-09-01')
-    await user.type(screen.getByLabelText('終了日'), '2026-09-30')
-    await user.click(screen.getByRole('button', { name: '絞り込む' }))
+      await user.click(screen.getByLabelText('開始日'))
+      await user.click(await screen.findByRole('button', { name: 'Tuesday, September 1st, 2026' }))
+      await user.click(screen.getByLabelText('終了日'))
+      await user.click(await screen.findByRole('button', { name: 'Wednesday, September 30th, 2026' }))
+      await user.click(screen.getByRole('button', { name: '絞り込む' }))
 
-    await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({ from: '2026-09-01', to: '2026-09-30' }))
+      await waitFor(() => expect(api.getReceipts).toHaveBeenCalledWith({ from: '2026-09-01', to: '2026-09-30' }))
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('re-fetches with store name and payment method filters when submitted', async () => {

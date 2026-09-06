@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Plus, Trash2 } from 'lucide-react'
+import { DatePicker } from '@/components/date-picker'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -137,12 +138,7 @@ export function ConfirmPage() {
 
           <div className="space-y-2">
             <Label htmlFor="purchased-at">購入日</Label>
-            <Input
-              id="purchased-at"
-              type="date"
-              value={purchasedAt}
-              onChange={(e) => setPurchasedAt(e.target.value)}
-            />
+            <DatePicker id="purchased-at" value={purchasedAt} onChange={setPurchasedAt} />
           </div>
         </CardContent>
       </Card>
