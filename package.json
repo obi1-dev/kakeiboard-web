@@ -1,6 +1,7 @@
 {
   "name": "kakeiboard-web",
   "type": "module",
+  "packageManager": "pnpm@11.21.0",
   "scripts": {
     "test": "vitest run --config vitest.config.ts",
     "test:client": "vitest run --config vitest.client.config.ts",
