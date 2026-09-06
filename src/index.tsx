@@ -1,3 +1,4 @@
+/** @jsxImportSource hono/jsx */
 import { Hono } from 'hono'
 import { renderer } from './renderer'
 import { paymentMethodsRoutes } from './api/payment-methods'

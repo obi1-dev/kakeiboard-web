@@ -1,3 +1,4 @@
+/** @jsxImportSource hono/jsx */
 import { jsxRenderer } from 'hono/jsx-renderer'
 import { Link, Script, ViteClient } from 'vite-ssr-components/hono'
 
