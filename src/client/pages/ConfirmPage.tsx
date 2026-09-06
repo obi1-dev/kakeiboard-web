@@ -3,11 +3,13 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { Plus, Trash2 } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select'
+import { Separator } from '@/components/ui/separator'
 import { getReceipt, getStoreNames, saveReceipt, updateReceipt } from '@/client/lib/api'
 import { CATEGORIES } from '@/shared/categories'
 import type { OcrDraft, ReceiptItemInput } from '@/shared/types'
@@ -58,10 +60,10 @@ export function ConfirmPage() {
   const mismatch = receiptTotal !== null && receiptTotal !== itemsTotal
 
   if (!receiptId && !state) {
-    return <p>スキャンからやり直してください</p>
+    return <p className="text-sm text-muted-foreground">スキャンからやり直してください</p>
   }
   if (!loaded) {
-    return <p>読み込み中...</p>
+    return <p className="text-sm text-muted-foreground">読み込み中...</p>
   }
 
   function updateItem(index: number, patch: Partial<ReceiptItemInput>) {
@@ -102,8 +104,11 @@ export function ConfirmPage() {
   }
 
   return (
-    <div>
-      <h1>確認</h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-tight">内容を確認</h1>
+        <p className="text-sm text-muted-foreground">読み取った内容を確認・修正して保存してください。</p>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -112,24 +117,35 @@ export function ConfirmPage() {
         </Alert>
       )}
 
-      <Label htmlFor="store-name">店名</Label>
-      <Input
-        id="store-name"
-        list="store-name-options"
-        value={storeName}
-        onChange={(e) => setStoreName(e.target.value)}
-      />
-      <datalist id="store-name-options">
-        {storeNames.map((name) => <option key={name} value={name} />)}
-      </datalist>
+      <Card>
+        <CardHeader>
+          <CardTitle>レシート情報</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-5 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="store-name">店名</Label>
+            <Input
+              id="store-name"
+              list="store-name-options"
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+            />
+            <datalist id="store-name-options">
+              {storeNames.map((name) => <option key={name} value={name} />)}
+            </datalist>
+          </div>
 
-      <Label htmlFor="purchased-at">購入日</Label>
-      <Input
-        id="purchased-at"
-        type="date"
-        value={purchasedAt}
-        onChange={(e) => setPurchasedAt(e.target.value)}
-      />
+          <div className="space-y-2">
+            <Label htmlFor="purchased-at">購入日</Label>
+            <Input
+              id="purchased-at"
+              type="date"
+              value={purchasedAt}
+              onChange={(e) => setPurchasedAt(e.target.value)}
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {mismatch && (
         <Alert variant="destructive">
@@ -141,52 +157,83 @@ export function ConfirmPage() {
         </Alert>
       )}
 
-      {items.map((item, index) => (
-        <div key={index}>
-          <Label htmlFor={`item-name-${index}`}>品名</Label>
-          <Input
-            id={`item-name-${index}`}
-            aria-label="品名"
-            value={item.name}
-            onChange={(e) => updateItem(index, { name: e.target.value })}
-          />
-          <Label htmlFor={`item-price-${index}`}>単価</Label>
-          <Input
-            id={`item-price-${index}`}
-            type="number"
-            value={item.price}
-            onChange={(e) => updateItem(index, { price: Number(e.target.value) })}
-          />
-          <Label htmlFor={`item-quantity-${index}`}>数量</Label>
-          <Input
-            id={`item-quantity-${index}`}
-            type="number"
-            value={item.quantity}
-            onChange={(e) => updateItem(index, { quantity: Number(e.target.value) })}
-          />
-          <Select value={item.category} onValueChange={(value) => updateItem(index, { category: value as ReceiptItemInput['category'] })}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {CATEGORIES.map((category) => (
-                <SelectItem key={category} value={category}>{category}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button variant="ghost" size="icon" aria-label="削除" onClick={() => removeItem(index)}>
-            <Trash2 />
+      <Card>
+        <CardHeader>
+          <CardTitle>明細</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {items.map((item, index) => (
+            <div key={index}>
+              {index > 0 && <Separator className="mb-4" />}
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-[2fr_1fr_1fr_1.2fr_auto] sm:items-end">
+                <div className="col-span-2 space-y-1.5 sm:col-span-1">
+                  <Label htmlFor={`item-name-${index}`} className="text-xs text-muted-foreground">品名</Label>
+                  <Input
+                    id={`item-name-${index}`}
+                    aria-label="品名"
+                    value={item.name}
+                    onChange={(e) => updateItem(index, { name: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`item-price-${index}`} className="text-xs text-muted-foreground">単価</Label>
+                  <Input
+                    id={`item-price-${index}`}
+                    type="number"
+                    value={item.price}
+                    onChange={(e) => updateItem(index, { price: Number(e.target.value) })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`item-quantity-${index}`} className="text-xs text-muted-foreground">数量</Label>
+                  <Input
+                    id={`item-quantity-${index}`}
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) => updateItem(index, { quantity: Number(e.target.value) })}
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs text-muted-foreground">カテゴリ</Label>
+                  <Select value={item.category} onValueChange={(value) => updateItem(index, { category: value as ReceiptItemInput['category'] })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>{category}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="削除"
+                  className="justify-self-end text-neutral-400 hover:text-destructive"
+                  onClick={() => removeItem(index)}
+                >
+                  <Trash2 />
+                </Button>
+              </div>
+            </div>
+          ))}
+
+          <Button variant="outline" size="sm" onClick={addItem}>
+            <Plus /> 行を追加
           </Button>
+        </CardContent>
+      </Card>
+
+      <div className="flex items-center justify-between rounded-lg border bg-white px-5 py-4">
+        <div>
+          <p className="text-xs text-muted-foreground">明細合計</p>
+          <p className="text-xl font-semibold tracking-tight">{itemsTotal.toLocaleString()}円</p>
         </div>
-      ))}
-
-      <Button variant="outline" onClick={addItem}>
-        <Plus /> 行を追加
-      </Button>
-
-      <p>明細合計: {itemsTotal}円</p>
-
-      <Button onClick={handleSave} disabled={saving}>OK</Button>
+        <Button size="lg" onClick={handleSave} disabled={saving}>
+          {saving ? '保存中...' : 'OK'}
+        </Button>
+      </div>
     </div>
   )
 }

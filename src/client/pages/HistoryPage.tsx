@@ -3,6 +3,7 @@ import { Download, Pencil, Trash2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
@@ -74,8 +75,18 @@ export function HistoryPage() {
   }
 
   return (
-    <div>
-      <h1>履歴</h1>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">履歴</h1>
+          <p className="text-sm text-muted-foreground">保存したレシートの一覧です。</p>
+        </div>
+        <Button asChild variant="outline">
+          <a href={exportCsvUrl(from || undefined, to || undefined)}>
+            <Download /> CSVダウンロード
+          </a>
+        </Button>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -84,67 +95,92 @@ export function HistoryPage() {
         </Alert>
       )}
 
-      <Label htmlFor="from-date">開始日</Label>
-      <Input id="from-date" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-      <Label htmlFor="to-date">終了日</Label>
-      <Input id="to-date" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-      <Label htmlFor="store-name-filter">店名</Label>
-      <Input
-        id="store-name-filter"
-        value={storeName}
-        onChange={(e) => setStoreName(e.target.value)}
-      />
-      <Label htmlFor="payment-method-filter">支払い方法</Label>
-      <Select value={paymentMethodId} onValueChange={setPaymentMethodId}>
-        <SelectTrigger id="payment-method-filter">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL_PAYMENT_METHODS}>すべて</SelectItem>
-          {paymentMethods.map((method) => (
-            <SelectItem key={method.id} value={method.id}>{method.name}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button onClick={handleFilter}>絞り込む</Button>
+      <Card>
+        <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 lg:items-end">
+          <div className="space-y-2">
+            <Label htmlFor="from-date">開始日</Label>
+            <Input id="from-date" type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="to-date">終了日</Label>
+            <Input id="to-date" type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="store-name-filter">店名</Label>
+            <Input
+              id="store-name-filter"
+              value={storeName}
+              onChange={(e) => setStoreName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="payment-method-filter">支払い方法</Label>
+            <Select value={paymentMethodId} onValueChange={setPaymentMethodId}>
+              <SelectTrigger id="payment-method-filter" className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={ALL_PAYMENT_METHODS}>すべて</SelectItem>
+                {paymentMethods.map((method) => (
+                  <SelectItem key={method.id} value={method.id}>{method.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button onClick={handleFilter}>絞り込む</Button>
+        </CardContent>
+      </Card>
 
-      <Button asChild variant="outline">
-        <a href={exportCsvUrl(from || undefined, to || undefined)}>
-          <Download /> CSVダウンロード
-        </a>
-      </Button>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>購入日</TableHead>
-            <TableHead>店名</TableHead>
-            <TableHead>支払い方法</TableHead>
-            <TableHead>合計</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {receipts.map((receipt) => (
-            <TableRow key={receipt.id}>
-              <TableCell>{receipt.purchased_at}</TableCell>
-              <TableCell>{receipt.store_name}</TableCell>
-              <TableCell>{paymentMethodName(receipt.payment_method_id)}</TableCell>
-              <TableCell>{itemsTotal(receipt)}円</TableCell>
-              <TableCell>
-                <Button asChild variant="ghost" size="icon" aria-label="編集">
-                  <Link to={`/receipts/${receipt.id}/edit`}>
-                    <Pencil />
-                  </Link>
-                </Button>
-                <Button variant="ghost" size="icon" aria-label="削除" onClick={() => handleDelete(receipt.id)}>
-                  <Trash2 />
-                </Button>
-              </TableCell>
+      <Card className="gap-0 py-0 overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="h-11 px-4">購入日</TableHead>
+              <TableHead className="h-11 px-4">店名</TableHead>
+              <TableHead className="h-11 px-4">支払い方法</TableHead>
+              <TableHead className="h-11 px-4 text-right">合計</TableHead>
+              <TableHead className="h-11 px-4" />
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {receipts.length === 0 && (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={5} className="py-10 text-center text-sm text-muted-foreground">
+                  該当するレシートがありません
+                </TableCell>
+              </TableRow>
+            )}
+            {receipts.map((receipt) => (
+              <TableRow key={receipt.id}>
+                <TableCell className="px-4 py-3">{receipt.purchased_at}</TableCell>
+                <TableCell className="px-4 py-3 font-medium">{receipt.store_name}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">
+                  {paymentMethodName(receipt.payment_method_id)}
+                </TableCell>
+                <TableCell className="px-4 py-3 text-right tabular-nums">
+                  {itemsTotal(receipt).toLocaleString()}円
+                </TableCell>
+                <TableCell className="px-4 py-3 text-right">
+                  <Button asChild variant="ghost" size="icon" aria-label="編集">
+                    <Link to={`/receipts/${receipt.id}/edit`}>
+                      <Pencil />
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="削除"
+                    className="text-neutral-400 hover:text-destructive"
+                    onClick={() => handleDelete(receipt.id)}
+                  >
+                    <Trash2 />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Trash2 } from 'lucide-react'
+import { Plus, Trash2, Wallet } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { Card } from '@/components/ui/card'
 import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
 } from '@/components/ui/dialog'
@@ -50,8 +51,32 @@ export function PaymentMethodsPage() {
   }
 
   return (
-    <div>
-      <h1>支払い方法</h1>
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">支払い方法</h1>
+          <p className="text-sm text-muted-foreground">現金・カードなど、レシート記録時に選ぶ支払い方法を管理します。</p>
+        </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus /> 追加
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>支払い方法を追加</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              <Label htmlFor="payment-method-name">名前</Label>
+              <Input id="payment-method-name" value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <DialogFooter>
+              <Button onClick={handleSave}>保存</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       {error && (
         <Alert variant="destructive">
@@ -60,42 +85,48 @@ export function PaymentMethodsPage() {
         </Alert>
       )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button>追加</Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>支払い方法を追加</DialogTitle>
-          </DialogHeader>
-          <Label htmlFor="payment-method-name">名前</Label>
-          <Input id="payment-method-name" value={name} onChange={(e) => setName(e.target.value)} />
-          <DialogFooter>
-            <Button onClick={handleSave}>保存</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>名前</TableHead>
-            <TableHead />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {methods.map((method) => (
-            <TableRow key={method.id}>
-              <TableCell>{method.name}</TableCell>
-              <TableCell>
-                <Button variant="ghost" size="icon" aria-label="削除" onClick={() => handleDelete(method.id)}>
-                  <Trash2 />
-                </Button>
-              </TableCell>
+      <Card className="gap-0 py-0 overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="h-11 px-4">名前</TableHead>
+              <TableHead className="h-11 px-4" />
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {methods.length === 0 && (
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={2} className="py-10 text-center text-sm text-muted-foreground">
+                  支払い方法が登録されていません
+                </TableCell>
+              </TableRow>
+            )}
+            {methods.map((method) => (
+              <TableRow key={method.id}>
+                <TableCell className="px-4 py-3">
+                  <span className="flex items-center gap-2.5 font-medium">
+                    <span className="flex size-7 items-center justify-center rounded-md bg-neutral-100 text-neutral-500">
+                      <Wallet size={14} />
+                    </span>
+                    {method.name}
+                  </span>
+                </TableCell>
+                <TableCell className="px-4 py-3 text-right">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="削除"
+                    className="text-neutral-400 hover:text-destructive"
+                    onClick={() => handleDelete(method.id)}
+                  >
+                    <Trash2 />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Card>
     </div>
   )
 }
