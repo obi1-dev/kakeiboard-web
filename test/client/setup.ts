@@ -15,6 +15,15 @@ if (!Element.prototype.scrollIntoView) {
   Element.prototype.scrollIntoView = () => {}
 }
 
+// jsdom doesn't implement these either, but ScanPage uses them to preview
+// the selected receipt image before upload.
+if (!URL.createObjectURL) {
+  URL.createObjectURL = () => 'blob:mock-url'
+}
+if (!URL.revokeObjectURL) {
+  URL.revokeObjectURL = () => {}
+}
+
 afterEach(() => {
   cleanup()
 })

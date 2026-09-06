@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Camera, ImagePlus } from 'lucide-react'
+import { Camera, ImagePlus, RefreshCw } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,6 +17,7 @@ export function ScanPage() {
   const [methods, setMethods] = useState<PaymentMethod[]>([])
   const [paymentMethodId, setPaymentMethodId] = useState<string>('')
   const [file, setFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [failedImageKey, setFailedImageKey] = useState<string | undefined>(undefined)
@@ -27,6 +28,16 @@ export function ScanPage() {
       if (list.length > 0) setPaymentMethodId(list[0].id)
     })
   }, [])
+
+  useEffect(() => {
+    if (!file) {
+      setPreviewUrl(null)
+      return
+    }
+    const url = URL.createObjectURL(file)
+    setPreviewUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
 
   async function handleScan() {
     if (!file || !paymentMethodId) return
@@ -93,16 +104,30 @@ export function ScanPage() {
 
           <div className="space-y-2">
             <Label htmlFor="receipt-image">レシート画像</Label>
-            <label
-              htmlFor="receipt-image"
-              className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-neutral-300 bg-neutral-50 px-6 py-8 text-center transition-colors hover:border-neutral-400 hover:bg-neutral-100"
-            >
-              <ImagePlus className="text-neutral-400" size={28} />
-              <span className="text-sm font-medium text-neutral-700">
-                {file ? file.name : 'タップして画像を選択'}
-              </span>
-              <span className="text-xs text-muted-foreground">JPEG・PNG</span>
-            </label>
+            {previewUrl ? (
+              <label
+                htmlFor="receipt-image"
+                className="group relative flex cursor-pointer flex-col items-center overflow-hidden rounded-lg border bg-neutral-50"
+              >
+                <img
+                  src={previewUrl}
+                  alt="選択したレシート画像のプレビュー"
+                  className="max-h-80 w-full object-contain"
+                />
+                <span className="flex w-full items-center justify-center gap-1.5 border-t bg-white py-2 text-sm font-medium text-neutral-700 group-hover:bg-neutral-100">
+                  <RefreshCw size={14} /> 別の画像に変更
+                </span>
+              </label>
+            ) : (
+              <label
+                htmlFor="receipt-image"
+                className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-neutral-300 bg-neutral-50 px-6 py-8 text-center transition-colors hover:border-neutral-400 hover:bg-neutral-100"
+              >
+                <ImagePlus className="text-neutral-400" size={28} />
+                <span className="text-sm font-medium text-neutral-700">タップして画像を選択</span>
+                <span className="text-xs text-muted-foreground">JPEG・PNG</span>
+              </label>
+            )}
             <input
               id="receipt-image"
               type="file"

@@ -24,6 +24,27 @@ vi.mock('react-router-dom', async (importOriginal) => {
 })
 
 describe('ScanPage', () => {
+  it('shows a preview of the selected image', async () => {
+    vi.mocked(api.getPaymentMethods).mockResolvedValue([
+      { id: 'pm1', name: '現金', created_at: '2026-01-01' },
+    ])
+    const file = new File(['bytes'], 'receipt.jpg', { type: 'image/jpeg' })
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <ScanPage />
+      </MemoryRouter>
+    )
+
+    expect(screen.queryByAltText('選択したレシート画像のプレビュー')).not.toBeInTheDocument()
+
+    const fileInput = await screen.findByLabelText('レシート画像')
+    await user.upload(fileInput, file)
+
+    expect(await screen.findByAltText('選択したレシート画像のプレビュー')).toBeInTheDocument()
+  })
+
   it('runs OCR on the selected image and navigates to /confirm with the draft', async () => {
     vi.mocked(api.getPaymentMethods).mockResolvedValue([
       { id: 'pm1', name: '現金', created_at: '2026-01-01' },
