@@ -7,7 +7,7 @@ import { Link, Script, ViteClient } from 'vite-ssr-components/hono'
 // HTML is generated server-side, so that hook never fires and every
 // react-refresh-instrumented module throws "can't detect preamble" on load.
 const ReactRefreshPreamble = () => {
-  if (import.meta.env.PROD) return null
+  if (import.meta.env && import.meta.env.PROD) return null
   return (
     <script
       type="module"
